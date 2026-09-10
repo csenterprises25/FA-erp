@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.CPANEL_FTP_USERNAME }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
           protocol: ftps
-          port: 21
+          port: ${{ vars.CPANEL_FTP_PORT || 21 }}
           security: strict
           local-dir: ./
           server-dir: ./

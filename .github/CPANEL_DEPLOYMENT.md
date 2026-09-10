@@ -17,9 +17,13 @@ Optionally add the environment variable `APP_URL`, such as
 `https://erp.example.com/`. The workflow uses it for the environment link and a
 post-deployment HTTP check.
 
+The optional environment variable `CPANEL_FTP_PORT` changes the FTPS port. It
+defaults to `21` when the variable is not configured.
+
 The workflow assumes explicit FTPS on port 21 with strict certificate
-validation. If the hosting provider specifies another port, change `port` in
-the workflow. Do not change the protocol to unencrypted `ftp`.
+validation. If the hosting provider specifies another port, set the
+`CPANEL_FTP_PORT` environment variable. Do not change the protocol to
+unencrypted `ftp`.
 
 ## One-time cPanel setup
 
