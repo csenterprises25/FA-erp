@@ -1,0 +1,62 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpanel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy application over FTPS
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+
+    steps:
+      - name: Check out the release
+        uses: actions/checkout@v6
+
+      - name: Deploy tracked files to cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.CPANEL_FTP_SERVER }}
+          username: ${{ secrets.CPANEL_FTP_USERNAME }}
+          password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          security: strict
+          local-dir: ./
+          server-dir: ./
+          log-level: standard
+          timeout: 120000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/install/**
+            **/config.php
+            **/config_db.php
+            **/installed_extensions.php
+            **/installed_languages.inc
+            **/company/*/attachments/**
+            **/company/*/backup/**
+            **/company/*/images/**
+            **/company/*/js_cache/**
+            **/company/*/pdf_files/**
+            **/company/*/reporting/**
+            **/tmp/**
+
+      - name: Verify the deployed site
+        if: ${{ vars.APP_URL != '' }}
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: curl --fail --silent --show-error --location --retry 3 --max-time 30 "$APP_URL"
