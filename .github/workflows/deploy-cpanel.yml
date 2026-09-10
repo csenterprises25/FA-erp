@@ -5,6 +5,12 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      deploy_installer:
+        description: Upload the installer for one-time application setup
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -54,6 +60,22 @@ jobs:
             **/company/*/pdf_files/**
             **/company/*/reporting/**
             **/tmp/**
+
+      - name: Upload installer for one-time setup
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_installer }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.CPANEL_FTP_SERVER }}
+          username: ${{ secrets.CPANEL_FTP_USERNAME }}
+          password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+          protocol: ftps
+          port: ${{ vars.CPANEL_FTP_PORT || 21 }}
+          security: strict
+          local-dir: ./install/
+          server-dir: ./install/
+          state-name: .ftp-deploy-installer-state.json
+          log-level: standard
+          timeout: 120000
 
       - name: Verify the deployed site
         if: ${{ vars.APP_URL != '' }}

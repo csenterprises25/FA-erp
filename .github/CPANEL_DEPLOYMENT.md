@@ -1,7 +1,8 @@
 # cPanel deployment
 
 The `Deploy to cPanel` workflow deploys the `master` branch with explicit FTPS.
-It can also be started manually from the repository's **Actions** tab.
+It can also be started manually from the repository's **Actions** tab. Manual
+runs provide a `Deploy installer` option for the one-time application setup.
 
 ## GitHub environment and secrets
 
@@ -31,10 +32,11 @@ unencrypted `ftp`.
 2. Create a MariaDB/MySQL database and a database user with access to it.
 3. Create an FTP account whose home is the application's deployment directory.
    The workflow deploys directly to that FTP home (`./`).
-4. Before enabling automated deployments, upload the `install` directory once
-   and run the FrontAccounting installer to create `config.php`, `config_db.php`,
-   the database schema, and the first administrator. The workflow intentionally
-   does not upload the installer.
+4. In GitHub, open **Actions → Deploy to cPanel → Run workflow**, enable
+   **Deploy installer**, and start the workflow. Then open `/install/` on the
+   application domain and run the FrontAccounting installer to create
+   `config.php`, `config_db.php`, the database schema, and the first
+   administrator.
 5. Remove or rename the remote `install` directory after setup, as recommended
    by FrontAccounting.
 6. Confirm the `company` and `tmp` runtime directories are writable by PHP.
@@ -44,6 +46,10 @@ The workflow deliberately preserves the live configuration, extension
 registry, attachments, backups, images, generated reports, PDFs, and caches.
 These contain installation-specific or user-generated data and must not be
 stored in GitHub.
+
+Normal pushes never upload the `install` directory. Only a manual run with the
+installer option enabled uploads it. Remove the remote `install` directory as
+soon as setup is complete.
 
 Mail server details are configured on the server only if outgoing email is
 needed. Database, mail, domain, and FrontAccounting administrator credentials
